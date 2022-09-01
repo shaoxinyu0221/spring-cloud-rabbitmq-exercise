@@ -1,0 +1,15 @@
+spring:
+    cloud:
+        nacos:
+            discovery:
+                server-addr: 81.68.64.142:8848
+                group: shaoxinyu
+                password: nacos
+                username: nacos
+            config:
+                file-extension: yaml
+                group: ${spring.cloud.nacos.discovery.group}
+                server-addr: ${spring.cloud.nacos.discovery.server-addr}
+                shared-configs:
+                    - group: ${spring.cloud.nacos.discovery.group}
+                      data-id: public-setting.yaml
