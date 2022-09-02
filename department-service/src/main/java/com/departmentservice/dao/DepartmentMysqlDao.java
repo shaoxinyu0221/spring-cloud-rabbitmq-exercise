@@ -1,6 +1,6 @@
 package com.departmentservice.dao;
 
-import com.example.departmentserviceapi.bean.Department;
+import com.departmentservice.bean.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

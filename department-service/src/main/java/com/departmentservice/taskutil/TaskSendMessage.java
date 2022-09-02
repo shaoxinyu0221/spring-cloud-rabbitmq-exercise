@@ -1,10 +1,11 @@
-package taskutil;
+package com.departmentservice.taskutil;
 
 import com.departmentservice.bean.Message;
 import com.departmentservice.dao.MessageMysqlDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,8 +29,9 @@ public class TaskSendMessage {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    @Scheduled(cron="*/6 * * * * ?")
     public void sendMessage(){
-
+        log.info("定时任务执行了");
         List<Message> messages = messageMysqlDao.getAllMessageNeedSend();
 
         if (messages.size() == 0){

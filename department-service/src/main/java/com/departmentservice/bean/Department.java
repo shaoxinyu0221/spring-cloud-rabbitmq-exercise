@@ -1,4 +1,4 @@
-package com.example.departmentserviceapi.bean;
+package com.departmentservice.bean;
 
 import javax.persistence.*;
 
@@ -6,7 +6,7 @@ import javax.persistence.*;
  * @author 邵鑫雨
  * @version 1.0
  * @description: TODO
- * @date 2022/9/1 22:07
+ * @date 2022/9/2 21:23
  */
 @Entity
 public class Department {

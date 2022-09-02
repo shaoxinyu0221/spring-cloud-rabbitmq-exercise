@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,6 @@ public class DepartmentServiceApplication {
     }
 
     @Resource
-    private DepartmentMysqlDao departmentMysqlDao;
-    @Resource
     private MessageMysqlDao messageMysqlDao;
 
     @Bean
@@ -38,21 +37,20 @@ public class DepartmentServiceApplication {
         RabbitTemplate rabbitTemplate = new RabbitTemplate();
         rabbitTemplate.setConnectionFactory(connectionFactory);
 
-        rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
-            @Override
-            public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-                log.info("消息到达rabbitTemplate");
-                String id = correlationData.getId();
-                Optional<Message> optional = messageMysqlDao.findById(Long.parseLong(id));
-                Message message = optional.orElseThrow(RuntimeException::new);
-                //如果消息送达,修改消息的状态为B
-                if (ack){
-                    message.setStatus("B");
-                }
-                //不管送没送达,发消息次数减一
-                message.setRetryCount(message.getRetryCount()-1);
-                messageMysqlDao.save(message);
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            log.info("消息到达rabbitTemplate");
+            assert correlationData != null;
+            String id = correlationData.getId();
+            assert id != null;
+            Optional<Message> optional = messageMysqlDao.findById(Long.parseLong(id));
+            Message message = optional.orElseThrow(RuntimeException::new);
+            //如果消息送达,修改消息的状态为B
+            if (ack){
+                message.setStatus("B");
             }
+            //不管送没送达,发消息次数减一
+            message.setRetryCount(message.getRetryCount()-1);
+            messageMysqlDao.save(message);
         });
 
         return rabbitTemplate;
